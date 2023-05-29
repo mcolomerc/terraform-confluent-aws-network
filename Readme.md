@@ -2,7 +2,7 @@
 
 Terraform module which creates VPC resources on AWS and Confluent Cloud networking resources.
 
-## AWS Resources**
+## AWS Resources
 
 * VPC
 * Subnets
@@ -16,7 +16,7 @@ Terraform module which creates VPC resources on AWS and Confluent Cloud networki
   * Transit Gateway Attachment
   * Transit Gateway Route Table
 
-## Confluent Cloud Resources**
+## Confluent Cloud Resources
 
 * Confluent Cloud Network
   * Network type: TRANSITGATEWAY
