@@ -4,21 +4,16 @@ aws = {
     prefix = "mcol",
     owner = "mcolomercornejo@confluent.io",
     vpc = {
-      number_of_public_subnets = 3
-      number_of_private_subnets = 3 
-    }
-    instance = {
-      name = "mcolomer-central"
-      type = "t2.micro" 
-    }
+      id = "vpc-08a7122ab9509d860" 
+    } 
+    account_id = "492737776546"
 }
 
 # Confluent 
 environment = "env-zmz2zd"
 
 confluent_network = {
-    display_name = "confluent-network"
-    connection_type = "TRANSITGATEWAY" 
-    cidr = "192.168.0.0/16"
+    display_name = "confluent-plink-network"
+    connection_type = "PRIVATELINK" 
 }
   

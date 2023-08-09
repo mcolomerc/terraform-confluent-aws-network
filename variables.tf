@@ -1,19 +1,21 @@
 # AWS
-variable "aws" {
+ variable "aws" {
   type = object({
     region = string
     prefix = string
     owner = string
     vpc = object({
-      number_of_public_subnets = number
-      number_of_private_subnets = number 
+      id = optional(string) # TODO: If not provided, create a new VPC
+      number_of_public_subnets = optional(number)
+      number_of_private_subnets = optional(number) 
     })
-    instance = object({
+    instance = optional(object({ # TODO: If provided, create a new EC2 Instance
         name = string
         type = string 
-    })
+    }))
+    account_id = optional(string) # TODO: Required for Private Link
   }) 
-}
+}  
 
 # Confluent Cloud Credentials  
 variable "confluent_cloud_api_key" {
@@ -26,11 +28,13 @@ variable "confluent_cloud_api_secret" {
    description = "Confluent Cloud API KEY. export TF_VAR_confluent_cloud_api_secret=\"API_SECRET\""
 }
 
+# Confluent Environment
 variable "environment" {
   type = string
   default = "dev"
 }
 
+# Confluent Network
 variable "confluent_network" {
   type = object({
     display_name = string  
@@ -52,3 +56,4 @@ RFC 2544 private address space: 198.18.0.0/15
     EOT
   }
 }
+ 
