@@ -94,6 +94,8 @@ confluent_network = {
 
 - New Confluent Cloud Private Link Network with AWS Provided VPC (vpc_id)
 
+File: `envs/plink_provided_vpcid.tfvars`
+
 ```hcl
 #AWS
 aws = {
@@ -115,12 +117,20 @@ confluent_network = {
 }
 ```
 
-- New Confluent Cloud Private Link Network & New AWS VPC  
-- New Confluent Cloud Private Link Network & New AWS VPC & New Jump Host
-- New Confluent Cloud Transit Gateway Network with AWS Provided VPC  
-- New Confluent Cloud Transit Gateway Network & New AWS VPC & New Jump Host
-- New Confluent Cloud Peering network with AWS Provided VPC and Jump Host
-- New Confluent Cloud Peering network & New AWS VPC & New Jump Host
+`terraform plan --var-file=./envs/plink_provided_vpcid.tfvars`
+
+`terraform destroy --var-file=./envs/plink_provided_vpcid.tfvars`
+
+- New Confluent Cloud Private Link Network & New AWS VPC - *TODO*
+- New Confluent Cloud Private Link Network & New AWS VPC & New Jump Host - *TODO*
+  
+- New Confluent Cloud Transit Gateway Network with AWS Provided VPC - *TODO*
+
+`terraform plan --var-file=./envs/tgw_provided_vpcid.tfvars`
+
+- New Confluent Cloud Transit Gateway Network & New AWS VPC & New Jump Host  *TODO*
+- New Confluent Cloud Peering network with AWS Provided VPC and Jump Host  *TODO*
+- New Confluent Cloud Peering network & New AWS VPC & New Jump Host  *TODO*
   
 ## Credentials
 
