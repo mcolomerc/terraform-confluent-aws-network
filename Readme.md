@@ -116,24 +116,12 @@ confluent_network = {
 ```
 
 - New Confluent Cloud Private Link Network & New AWS VPC  
-  TBT
-
 - New Confluent Cloud Private Link Network & New AWS VPC & New Jump Host
-  TBT
-
 - New Confluent Cloud Transit Gateway Network with AWS Provided VPC  
-  TBT
-
 - New Confluent Cloud Transit Gateway Network & New AWS VPC & New Jump Host
-  TBT
-
 - New Confluent Cloud Peering network with AWS Provided VPC and Jump Host
-  TBT
-
 - New Confluent Cloud Peering network & New AWS VPC & New Jump Host
-  TBT
- 
-
+  
 ## Credentials
 
 ### AWS Credentials
