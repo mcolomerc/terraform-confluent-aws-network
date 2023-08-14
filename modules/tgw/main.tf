@@ -1,6 +1,27 @@
 
+# Confluent Cloud Environment 
+data "confluent_environment" "main" {
+  id = var.environment
+}
+# AWS Availability Zones
+data "aws_availability_zones" "available" {}
 
+# AWS VPC
+data "aws_vpc" "selected" {
+  id = var.vpc_id
+}
 
+# AWS Subnets query
+data "aws_subnets" "selected" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
+  filter {
+    name   = "map-public-ip-on-launch"
+    values = [true]
+  }
+}
 
 # Create the Confluent Network for the tgw
 resource "confluent_network" "tgw" {

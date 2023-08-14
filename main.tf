@@ -39,7 +39,6 @@ module "plink" {
 }
 
 # CONFLUENT - AWS TGW
-/*
 module "tgw" { 
    providers = {
       confluent = confluent.confluent_cloud
@@ -49,9 +48,9 @@ module "tgw" {
    prefix = var.aws.prefix
    owner = var.aws.owner
    region = var.aws.region
-   vpc_id = data.aws_vpc.selected.id
-   route_table_id = module.aws.route_table_id # TODO: Resolve this dependency
+   vpc_id = can(var.aws.vpc.id) ? var.aws.vpc.id : module.aws_vpc.vpc.id
+   route_table_id = module.aws_vpc.route_table.id # TODO: Resolve this dependency
    environment = var.environment
    confluent_network_name = var.confluent_network.display_name
-} */
+} 
 

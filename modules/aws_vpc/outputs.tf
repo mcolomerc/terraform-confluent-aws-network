@@ -14,3 +14,6 @@ output "internet_gateway" {
   value = aws_internet_gateway.vpc_internet_gateway
 }
 
+output "route_table" {
+  value = aws_route_table.vpc_route_table
+}
