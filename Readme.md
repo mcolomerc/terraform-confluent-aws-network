@@ -52,7 +52,7 @@ aws = {
 
 ## Confluent Cloud Network
 
-**Options**: TRANSITGATEWAY or PRIVATELINK
+**Options**: TRANSITGATEWAY or PRIVATELINK or PEERING
 
 ```hcl
 confluent_network = {
