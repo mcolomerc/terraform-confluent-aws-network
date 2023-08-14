@@ -4,24 +4,123 @@ Terraform module which creates VPC resources on AWS and Confluent Cloud networki
 
 ## AWS Resources
 
-* VPC
-* Subnets
-* Internet Gateway
-* Route Table
-* Route Table Association
-* Bastion host
+### AWS VPC
+
+**Options**:
+
+- Use an exisiting VPC, provide ```aws.vpc.id```:
+
+ 
+```hcl
+aws = {
+  vpc = {
+    id = "vpc-1234567890"
+  }
+}
+```
+
+- Create a new VPC, provide `number_of_public_subnets` and `number_of_private_subnets`:
+
+```hcl
+aws = {
+ vpc = {
+      number_of_public_subnets = 3
+      number_of_private_subnets = 3 
+    }
+}
+```
+
+## Jump Host 
+
+**Optional**: jump host to access the private network.
+
+* EC2 Instance
+  * Security Group
+  * Key Pair
+
+Provide *instance* name and type:
+
+```hcl
+aws = {
+ instance = {
+      name = "mcolomer-central"
+      type = "t2.micro" 
+    }
+}
+```
   
-* Network type: TRANSITGATEWAY
-  * Transit Gateway
-  * Transit Gateway Attachment
-  * Transit Gateway Route Table
 
-## Confluent Cloud Resources
+## Confluent Cloud Network
 
-* Confluent Cloud Network
-  * Network type: TRANSITGATEWAY
-    * Transit Gateway
-    * Transit Gateway Attachment
+**Options**: TRANSITGATEWAY or PRIVATELINK or PEERING
+
+```hcl
+confluent_network = {
+    display_name = "confluent-plink-network"
+    connection_type = "PRIVATELINK" 
+}
+```
+
+- Connection type: *TRANSITGATEWAY*
+  - Confluent:
+    - Transit Gateway network
+    - Transit Gateway Attachment
+  - AWS:
+    - Transit Gateway
+    - Transit Gateway Attachment
+    - Transit Gateway Route
+    - Resource Share (RAM)
+  
+- Connection type: *PRIVATELINK*
+  - Confluent:
+    - Private Link Network
+    - Private Link Access
+  - AWS:
+    - Endpoint
+    - Service Group
+    - Private Hosted Zone (Route53)
+
+- Connection type: *PEERING*
+  - Confluent:
+    - Peering Network
+    - Peering Connection
+  - AWS:
+    - VPC Peering Connection
+    - Peering Connection Accepter
+    - Route Table
+    - Route
+
+## Tested Scenarios
+
+- New Confluent Cloud Private Link Network with AWS Provided VPC (vpc_id)
+
+```hcl
+#AWS
+aws = {
+    region = "eu-central-1",
+    prefix = "mcol",
+    owner = "mcolomercornejo@confluent.io",
+    vpc = {
+      id = "vpc-08a7122ab9509d860" 
+    } 
+    account_id = "492737776546"
+}
+
+# Confluent 
+environment = "env-zmz2zd"
+
+confluent_network = {
+    display_name = "confluent-plink-network"
+    connection_type = "PRIVATELINK" 
+}
+```
+
+- New Confluent Cloud Private Link Network & New AWS VPC  
+- New Confluent Cloud Private Link Network & New AWS VPC & New Jump Host
+- New Confluent Cloud Transit Gateway Network with AWS Provided VPC  
+- New Confluent Cloud Transit Gateway Network & New AWS VPC & New Jump Host
+- New Confluent Cloud Peering network with AWS Provided VPC and Jump Host
+- New Confluent Cloud Peering network & New AWS VPC & New Jump Host
   
 ## Credentials
 

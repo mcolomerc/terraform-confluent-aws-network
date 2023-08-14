@@ -1,25 +1,5 @@
 
-# Environment 
-data "confluent_environment" "main" {
-  id = var.environment
-}
 
-data "aws_availability_zones" "available" {}
-
-data "aws_vpc" "selected" {
-  id = var.vpc_id
-}
-
-data "aws_subnets" "selected" {
-  filter {
-     name   = "vpc-id"
-     values = [data.aws_vpc.selected.id]
-  }
-  filter {
-    name = "map-public-ip-on-launch"
-    values = [true]
-  }
-} 
 
 
 # Create the Confluent Network for the tgw
