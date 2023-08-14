@@ -11,6 +11,7 @@ data "aws_availability_zones" "available" {}
 #   - Routing table
 
 resource "aws_vpc" "vpc" {
+  count = var.vpc_id == null ? 1 : 0
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true # Internal domain name
   enable_dns_hostnames = true # Internal host name
@@ -21,13 +22,17 @@ resource "aws_vpc" "vpc" {
   }
 }
 
+locals {
+  vpc_id = var.vpc_id != null ? var.vpc_id : aws_vpc.vpc[0].id
+}
+
 resource "aws_subnet" "vpc_public_subnet" {
   # Number of public subnet is defined in vars
   count = var.number_of_public_subnets
 
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   cidr_block              = "10.0.${count.index + var.number_of_private_subnets}.0/24"
-  vpc_id                  = aws_vpc.vpc.id
+  vpc_id                  = aws_vpc.vpc[0].id
   map_public_ip_on_launch = true # This makes the subnet public
 
   tags = {
@@ -42,7 +47,7 @@ resource "aws_subnet" "vpc_private_subnet" {
 
   availability_zone = data.aws_availability_zones.available.names[count.index]
   cidr_block        = "10.0.${count.index}.0/24"
-  vpc_id            = aws_vpc.vpc.id
+  vpc_id            = aws_vpc.vpc[0].id
 
   tags = {
     Name = "${var.prefix}-private-subnet-${count.index}"
@@ -51,7 +56,8 @@ resource "aws_subnet" "vpc_private_subnet" {
 }
 
 resource "aws_internet_gateway" "vpc_internet_gateway" {
-  vpc_id = aws_vpc.vpc.id
+  count = var.vpc_id == null ? 1 : 0
+  vpc_id = local.vpc_id
 
   tags = {
     Name = "${var.prefix}-internet-gateway"
@@ -59,15 +65,18 @@ resource "aws_internet_gateway" "vpc_internet_gateway" {
   }
 }
 
+
+
 resource "aws_route_table" "vpc_route_table" {
-  vpc_id = aws_vpc.vpc.id
+  count = var.vpc_id == null ? 1 : 0
+  vpc_id = local.vpc_id
 
   route {
     # Associated subet can reach public internet
     cidr_block = "0.0.0.0/0"
 
     # Which internet gateway to use
-    gateway_id = aws_internet_gateway.vpc_internet_gateway.id
+    gateway_id = aws_internet_gateway.vpc_internet_gateway[0].id
   }
 
   tags = {
@@ -78,90 +87,7 @@ resource "aws_route_table" "vpc_route_table" {
 
 resource "aws_route_table_association" "custom-rtb-public-subnet" {
   count          = var.number_of_public_subnets
-  route_table_id = aws_route_table.vpc_route_table.id
+  route_table_id = aws_route_table.vpc_route_table[0].id
   subnet_id      = aws_subnet.vpc_public_subnet.*.id[count.index]
 } 
-
-# Create a AWS EC2 for external access
-resource "aws_security_group" "bastion-sg" {
-  name = "${var.prefix}-sg"
-  description = "${var.prefix}-sg"
-  vpc_id =  aws_vpc.vpc.id 
-  // To Allow SSH Transport
-  ingress {
-    from_port = 22
-    protocol = "tcp"
-    to_port = 22
-    cidr_blocks = ["0.0.0.0/0"]
-  } 
- 
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-  } 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-#KEY PAIR 
-resource "tls_private_key" "rsa" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "aws_key_pair" "tf-key-pair" {
-  key_name = "${var.prefix}-key-pair"
-  public_key = tls_private_key.rsa.public_key_openssh
-
-  provisioner "local-exec" { # Create "myKey.pem" to your computer!!
-    command = "echo '${tls_private_key.rsa.private_key_pem}' > ./${var.prefix}-key-pair.pem"
-  }
-} 
-
-# AMI
-data "aws_ami" "ubuntu" {
-    most_recent = true
-
-    filter {
-        name   = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-    }
-
-    filter {
-        name   = "virtualization-type"
-        values = ["hvm"]
-    }
-
-    owners = ["099720109477"] # Canonical
-}
-
-
-
-## AWS INSTANCE
-resource "aws_instance" "bastion" {
-  ami = "${data.aws_ami.ubuntu.id}"
-  instance_type = var.instance.type
-  subnet_id = aws_subnet.vpc_public_subnet[0].id
-  associate_public_ip_address = true
-  key_name = aws_key_pair.tf-key-pair.key_name 
-
-  vpc_security_group_ids = [
-    aws_security_group.bastion-sg.id
-  ]
-
-  root_block_device {
-    delete_on_termination = true 
-    volume_size = 50
-    volume_type = "gp2"
-  }
-  tags = {
-    Name = "${var.prefix}-bastion" 
-    Owner = var.owner
-  }
-
-  depends_on = [ aws_security_group.bastion-sg ]
-}
 

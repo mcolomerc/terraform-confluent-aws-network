@@ -28,4 +28,13 @@ variable "aws_account_id" {
   description = "The AWS Account ID (12 digits)"
   type        = string
 }
- 
+
+# AWS Prefix Tags
+variable "prefix" {
+ type = string
+}
+
+# AWS Owner Tag
+variable "owner" {
+ type = string
+}

@@ -5,9 +5,9 @@
     prefix = string
     owner = string
     vpc = object({
-      id = optional(string) # TODO: If not provided, create a new VPC
-      number_of_public_subnets = optional(number)
-      number_of_private_subnets = optional(number) 
+      id = optional(string, null) # TODO: If not provided, create a new VPC
+      number_of_public_subnets = optional(number, 0)
+      number_of_private_subnets = optional(number, 0) 
     })
     instance = optional(object({ # TODO: If provided, create a new EC2 Instance
         name = string

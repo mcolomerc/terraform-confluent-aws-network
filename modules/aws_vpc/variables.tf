@@ -4,6 +4,11 @@ variable "region" {
   default = "eu-east-1"
 }
 
+variable "vpc_id" {
+  description = "The AWS VPC ID"
+  type        = string
+}
+
 # AWS Availability Zones - Public Subnets
 variable "number_of_public_subnets" {
   type = number
@@ -26,11 +31,4 @@ variable "owner" {
  type = string
 }
 
-# AWS EC2 Instance
-variable "instance" {
-    type = object({
-        name = string
-        type = string 
-    }) 
-}
  
