@@ -1,3 +1,4 @@
+ 
 # AWS VPC and SUBNETS # TODO Handle optional VPC creation
 # Create AWS VPC and Subnets if aws.vpc_id is not provided 
 module "aws_vpc" {

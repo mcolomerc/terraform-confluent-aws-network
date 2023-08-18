@@ -19,6 +19,8 @@ aws = {
 }
 ```
 
+Enable **auto-assign public IPv4 address** for Subnets. Module uses `map-public-ip-on-launch` for subnet selecting.
+
 - Create a new VPC, provide `number_of_public_subnets` and `number_of_private_subnets`:
 
 ```hcl
@@ -90,11 +92,13 @@ confluent_network = {
     - Route Table
     - Route
 
-## Tested Scenarios
+## Usage 
+
+
+
+### Tested Scenarios
 
 - New Confluent Cloud Private Link Network with AWS Provided VPC (vpc_id)
-
-File: `envs/plink_provided_vpcid.tfvars`
 
 ```hcl
 #AWS
@@ -117,36 +121,40 @@ confluent_network = {
 }
 ```
 
-`terraform plan --var-file=./envs/plink_provided_vpcid.tfvars`
+```hcl
+module "network" { 
+  source   = "github.com/mcolomerc/terraform-confluent-aws-network" 
+  environment = var.confluent.environment.id
+  providers = {
+    confluent.confluent_cloud = confluent 
+    aws = aws
+  }
+  aws = {
+    region = var.confluent.environment.network.aws.region,
+    prefix = var.confluent.environment.network.aws.prefix,
+    owner  = var.confluent.environment.network.aws.owner,
+    vpc = {
+      id = var.confluent.environment.network.aws.vpc.id,
+    }
+    account_id = var.confluent.environment.network.aws.account_id,
+  }
+  confluent_network = {
+    display_name    = var.confluent.environment.network.display_name,
+    connection_type = var.confluent.environment.network.connection_type,
+  } 
+}
+```
 
-`terraform destroy --var-file=./envs/plink_provided_vpcid.tfvars`
 
 - New Confluent Cloud Private Link Network & New AWS VPC - *TODO*
 - New Confluent Cloud Private Link Network & New AWS VPC & New Jump Host - *TODO*
-  
 - New Confluent Cloud Transit Gateway Network with AWS Provided VPC - *TODO*
-
-`terraform plan --var-file=./envs/tgw_provided_vpcid.tfvars`
-
 - New Confluent Cloud Transit Gateway Network & New AWS VPC & New Jump Host  *TODO*
 - New Confluent Cloud Peering network with AWS Provided VPC and Jump Host  *TODO*
 - New Confluent Cloud Peering network & New AWS VPC & New Jump Host  *TODO*
   
-## Credentials
 
-### AWS Credentials
-
-`export AWS_ACCESS_KEY_ID="anaccesskey"`
-
-`export AWS_SECRET_ACCESS_KEY="asecretkey"`
-
-### Confluent Cloud Credentials
-
-`export TF_VAR_confluent_cloud_api_key="<API-KEY>"`  
-
-`export TF_VAR_confluent_cloud_api_secret="<API-SECRET>"`
-
-## Bastion host
+## Jump Host
 
 `mv <prefix>-key-pair.pem ~/.ssh/`
 

@@ -45,15 +45,17 @@ resource "confluent_private_link_access" "aws" {
 ## AWS VPC Endpoint
 
 # AWS Availability Zones
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+  
+}
 
 # AWS VPC
 data "aws_vpc" "selected" {
-  id = var.vpc_id
+  id = var.vpc_id 
 }
 
 # AWS Subnets query
-data "aws_subnets" "selected" {
+data "aws_subnets" "selected" {  
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.selected.id]
@@ -63,12 +65,10 @@ data "aws_subnets" "selected" {
     values = [true]
   }
 }
-data "aws_subnet" "vpc_live" {
+data "aws_subnet" "vpc_live" { 
   for_each = toset(data.aws_subnets.selected.ids)
   id       = each.key
-}
-
- 
+} 
 
 locals {
   availability_zone_subnets = { for s in data.aws_subnet.vpc_live : s.availability_zone => s.id... }
@@ -78,7 +78,7 @@ locals {
 ## AWS ENDPOINT SECURITY GROUP
 resource "aws_security_group" "privatelink" {
   # Ensure that SG is unique, so that this module can be used multiple times within a single VPC
-  name        = "${var.prefix}-privatelink-sg"
+  name        = "${var.vpc_id}-sg"
   description = "Confluent Cloud Private Link minimal security group in ${var.vpc_id}"
   vpc_id      = data.aws_vpc.selected.id
 
@@ -147,6 +147,9 @@ resource "aws_route53_record" "privatelink" {
   ttl     = "60"
   records = [
     aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"]
+  ]
+  depends_on = [
+    aws_vpc_endpoint.privatelink,
   ]
 }
 
